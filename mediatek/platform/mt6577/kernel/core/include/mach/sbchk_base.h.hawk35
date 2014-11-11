@@ -1,0 +1,129 @@
+#ifndef _SBCHK_BASE_H
+#define _SBCHK_BASE_H
+
+#ifndef FALSE
+  #define FALSE (0)
+#endif
+
+#ifndef TRUE
+  #define TRUE  (1)
+#endif
+
+/**************************************************************************
+ *  HASH CONFIGURATION
+ **************************************************************************/
+#define HASH_OUTPUT_LEN                     (20)
+
+/**************************************************************************
+ *  SBCHK PATH
+ **************************************************************************/
+#define SBCHK_ENGINE_PATH                   "/system/bin/sbchk"
+#define SBCHK_MODULE_PATH                   "/system/lib/modules/sec.ko"
+#define MODEM_CORE_MODULE_PATH              "/system/lib/modules/ccci.ko"
+#define MODEM_PLAT_MODULE_PATH              "/system/lib/modules/ccci_plat.ko"
+#define INIT_RC_PATH                        "init.rc"
+
+/**************************************************************************
+ *  SBCHK CHECK
+ **************************************************************************/
+//<2012/12/20-19033-EricLin, [Secu] Enable the sbchk in dev05 key.
+//<20121004-14654-Eric Lin, [Hawk4.0][secu] To modify  the sbchk related settings.
+#if defined(KEY_TYPE_MP)  || defined(KEY_TYPE_DEV)
+#define SBCHK_BASE_HASH_CHECK               1		// 0
+#else
+#define SBCHK_BASE_HASH_CHECK               0		// 0
+#endif
+/**************************************************************************
+ *  SBCHK HASH VALUE
+ **************************************************************************/
+#if SBCHK_BASE_HASH_CHECK
+
+/*
+		[hawk35]
+    #error MUST fill the hash value of '/system/bin/sbchk', 
+    'init.rc', '/system/lib/modules/sec.ko', '/system/lib/modules/ccci.ko' and 
+    '/system/lib/modules/ccci_plat.ko'
+*/
+
+    /* 
+       Kernel will compare hash values to check if 
+       the loaded program are exact as what you expect
+       To ensure the hash value you fill is right. 
+       The steps to obtain hash value are listed below;
+       
+           (1) Turn off SBCHK_BASE_HASH_CHECK   
+           (2) Download images and record kernel log      
+           (3) Find the string pattern '[SBCHK_BASE]' in kernel log      
+           (4) The hash value of '/system/bin/sbchk' is calculated          
+               [SBCHK_BASE] Calculate the hash value of '/system/bin/sbchk' =
+               xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx              
+           (5) Fill hash value in SBCHK_ENGINE_HASH   
+           (6) The hash value of '/system/lib/modules/sec.ko' is calculated          
+               [SBCHK_BASE] Calculate the hash value of '/system/lib/modules/sec.ko' =
+               xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx              
+           (7) Fill hash value in SBCHK_MODULE_HASH
+           (8) The hash value of '/system/lib/modules/ccci.ko' is calculated          
+               [SBCHK_BASE] Calculate the hash value of '/system/lib/modules/ccci.ko' =
+               xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx              
+           (9) Fill hash value in MODEM_CORE_MODULE_HASH           
+           (10) The hash value of '/system/lib/modules/ccci_plat.ko' is calculated          
+               [SBCHK_BASE] Calculate the hash value of '/system/lib/modules/ccci_plat.ko' =
+               xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx              
+           (11) Fill hash value in MODEM_PLAT_MODULE_HASH                      
+           (12) The hash value of 'init.rc' is calculated          
+               [SBCHK_BASE] Calculate the hash value of 'init.rc' =
+               xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx              
+           (13) Fill hash value in INIT_RC_HASH  
+
+       PLEASE NOTE THAT !!!!!!
+       The hash value may be changed if compile tool chain is updated or customer modify this user space program     
+       Before delivering boot image, please double check if the hash value should be updated or not.
+    */
+#if defined(KEY_TYPE_MTK) 
+//#error #1
+#define SBCHK_ENGINE_HASH		"2e9f375d3d0e4da90783bc64c46c962e50d8e615"
+#define SBCHK_MODULE_HASH		"6b6742c0c8f9c3c71706cc8b8c464ee536341084"
+#define MODEM_CORE_MODULE_HASH		"9a4c6354563538eef5c5519e6b209e059125f560"
+#define MODEM_PLAT_MODULE_HASH		"10b6d5c20d3e1daaf77db12d084bc956ae0a3b55"
+#define INIT_RC_HASH		"af7c8bb1553bb0868be207ff8509641cfad16699"
+#elif defined(KEY_TYPE_MP) || defined(KEY_TYPE_DEV)
+//#error #2
+//{sbc-chcek-start
+#define SBCHK_ENGINE_HASH		"42aa15dde8b56f1cb9dc4474d171b551398525bd"
+#define SBCHK_MODULE_HASH		"c41519fc7fa71d2619f3b1598fe4d06faa1fca08"
+#define MODEM_CORE_MODULE_HASH		"a1e71b7d698632bd61dee1f1a0ac3d7897204356"
+#define MODEM_PLAT_MODULE_HASH		"88683124a6376876e2ffd84115ded4d7779d014c"
+#define INIT_RC_HASH		"cc0ed77f2ad00670528a74f508443f2ee2d068d4"
+//}sbc-chcek-end
+#else
+#error "[ERROR] unkonw key type!!!"
+#endif
+#else
+    /* dummy */
+    //#define SBCHK_ENGINE_HASH "3a816d2e275818cb12b839a10e838a1e10d729f7"
+    #define SBCHK_ENGINE_HASH "0000000000000000000000000000000000000000"
+    #define SBCHK_MODULE_HASH "0000000000000000000000000000000000000000"
+    #define MODEM_CORE_MODULE_HASH "0000000000000000000000000000000000000000"    
+    #define MODEM_PLAT_MODULE_HASH "0000000000000000000000000000000000000000"    
+    #define INIT_RC_HASH "0000000000000000000000000000000000000000"        
+
+#endif  
+//>20121004-14654-Eric Lin
+//>2012/12/20-19033-EricLin
+
+/**************************************************************************
+ *  ERROR CODE
+ **************************************************************************/
+#define SEC_OK                              (0x0000)
+#define SBCHK_BASE_OPEN_FAIL                (0x1000)
+#define SBCHK_BASE_READ_FAIL                (0x1001)
+#define SBCHK_BASE_HASH_INIT_FAIL           (0x1002)
+#define SBCHK_BASE_HASH_DATA_FAIL           (0x1003)
+#define SBCHK_BASE_HASH_CHECK_FAIL          (0x1004)
+
+/**************************************************************************
+ *  EXTERNAL FUNCTION
+ **************************************************************************/
+extern void sbchk_base(void);
+
+#endif   /*_SBCHK_BASE*/
